@@ -105,6 +105,6 @@ main(argc, argv)
 	if ((kp = kvm_getprocs(kd, what, flag, &nentries)) == 0)
 		errx(1, "%s", kvm_geterr(kd));
 
-	exit(1);
+	exit(0);
 }
 
