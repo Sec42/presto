@@ -1,0 +1,22 @@
+This program was created as an example that write access to /dev/kmem
+is all you need :)
+
+so, as quick "chmod a+w /dev/kmem" as root will keep you a nice beckdoor :)
+
+presto runs on FreeBSD only at the moment -- sorry still have to do 
+a linux version. It was tested on FreeBSD 2.1.0-Release 
+
+it changes the real uid and effective uid of any process runing to a
+user specified value.
+
+Switches:
+	-M /dev/kmem	speciefies an alternate location for an writable kmem
+	-p pid		which process to modify, 
+			default = ppid i.e. the shell you call it from
+	-u uid		uid to change to, default = 0
+	-e uid		Only change effective-uid
+	-d 		print some debugging stuff
+	-h		short help
+
+CU & have fun
+		sec@42.org
