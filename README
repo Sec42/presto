@@ -1,23 +1,26 @@
-Welcome to the second release of presto.
+Welcome to the third release of presto.
+
+Presto changes the real/effective uid of any running process to a
+user specified value.
 
 At first I created this as an 'proof of concept' that write access to
-/dev/kmem is enough to get root. Some people refuse to belive anything
-until they see it.
+/dev/kmem is enough to get root. Some people refused to belive anything
+until they see it. And it was fun to write.
 
-After I wrote it, i found it very handy for these situations where you
-vi a file, and on save&exiting notice the file is not writable by you.
-Just promote the vi to root with presto, and voila!
+After I wrote it, i found it very handy for situations where I
+vi a file in /etc, and when I want to save my changes, I notice that I
+wasn't root, so I'm not allowed to write to it.
+
+With presto you can just promote the vi to root with presto, and voila!
+If you use 'sudo' it is as simple as ':!sudo presto' from inside vi,
+the default parameters just do the right thing in this case.
 
 Presto only runs on FreeBSD (i386) at the moment -- sorry.
 Linux is far to different to port this there.
 It should be possible to run it on Net/OpenBSD too. You might want to
-take a look at kvm.diff to see the relevant tricks.
+take a look at the *.diff files to see the relevant tricks.
 
-I tested it on FreeBSD 3.2-STABLE and 4.1-STABLE, but it should run on any
-3.x/4.x system.
-
-it changes the real uid and effective uid of any process runing to a
-user specified value.
+This version now contains a patch to run on FreeBSD-4.2.
 
 Switches:
 	-M /dev/kmem	speciefies an alternate location for an writable kmem
@@ -29,4 +32,4 @@ Switches:
 	-h		short help
 
 CU & have fun
-		sec@42.org
+		Stefan `Sec` Zehl <sec@42.org>

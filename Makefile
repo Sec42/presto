@@ -19,8 +19,18 @@ realclean: clean
 new: $(KVM)
 
 $(KVM):
-	wd=`pwd`;cd /usr/src/lib/libkvm && cp $(KVM) $$wd
-	patch < kvm.diff
+	@VERS=`awk '/define/{print $$3}' /usr/include/osreldate.h` && \
+	if [ -f $$VERS.diff ] ; then \
+	wd=`pwd` && cd /usr/src/lib/libkvm && cp $(KVM) $$wd && \
+	cd $$wd && patch < $$VERS.diff ;\
+	else \
+	echo ;\
+	echo Sorry there is no diff for $$VERS, You can try using the ;\
+	echo next-bigger or the next smaller patch. One of them should ;\
+	echo apply cleanly. ;\
+	echo ;\
+	exit 1 ;\
+	fi
 
 dist: realclean new
 	$(RM) *.orig
