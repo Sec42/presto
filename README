@@ -1,10 +1,22 @@
-This program was created as an example that write access to /dev/kmem
-is all you need :)
+Welcome to the second release of presto.
 
-so, as quick "chmod a+w /dev/kmem" as root will keep you a nice beckdoor :)
+At first I created this as an 'proof of concept' that write access to
+/dev/kmem is enough to get root. Some people refuse to belive anything
+until they see it.
 
-presto runs on FreeBSD only at the moment -- sorry still have to do 
-a linux version. It was tested on FreeBSD 2.1.0-Release 
+After I wrote it, i found it very handy for these situations where you
+vi a file, and on save&exiting notice the file is not writable by you.
+Just promote the vi to root with presto, and voila!
+
+With this program a quick "chmod a+w /dev/kmem" as root will keep you
+a nice backdoor :) - Or you could mknod it somewhere else to hide it.
+
+presto only runs on FreeBSD (i386) at the moment -- sorry.
+Linux is far to different to port this there.
+It should be possible to run it on Net/OpenBSD too. You might want to
+take a look at kvm.diff to see the relevant tricks.
+
+I tested it on FreeBSD 3.2-STABLE, but should run on any 3.x system.
 
 it changes the real uid and effective uid of any process runing to a
 user specified value.
@@ -14,7 +26,7 @@ Switches:
 	-p pid		which process to modify, 
 			default = ppid i.e. the shell you call it from
 	-u uid		uid to change to, default = 0
-	-e uid		Only change effective-uid
+	-e uid		Only change effective-uid (does not show in ps)
 	-d 		print some debugging stuff
 	-h		short help
 
