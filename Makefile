@@ -9,11 +9,11 @@ debug:
 	$(MAKE) CFLAGS="-Wall -g"
 
 clean:
-	$(RM) $(OBJ) presto presto.core
+	$(RM) $(OBJ) presto presto.core *.org
 
 # The stuff below is probably not very interesting
 
-realclean: clean
+distclean realclean: clean
 	$(RM) $(KVM) *.orig tags
 	
 new: $(KVM)
