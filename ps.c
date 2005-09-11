@@ -8,11 +8,9 @@ static char sccsid[] = "@(#)ps.c	8.4 (Berkeley) 4/2/94";
 
 #include <sys/param.h>
 #include <sys/user.h>
-#include <sys/time.h>
 #include <sys/resource.h>
 #include <sys/proc.h>
 #include <sys/stat.h>
-#include <sys/ioctl.h>
 #include <sys/sysctl.h>
 
 #include <ctype.h>
@@ -20,29 +18,16 @@ static char sccsid[] = "@(#)ps.c	8.4 (Berkeley) 4/2/94";
 #include <errno.h>
 #include <fcntl.h>
 #include <kvm.h>
-#include <nlist.h>
 #include <paths.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
-
-#include "ps.h"
-
-#ifdef P_PPWAIT
-#define NEWVM
-#endif
-
-KINFO *kinfo;
-struct varent *vhead, *vtail;
-
 
 pid_t target_pid = -1;
 uid_t target_euid = 0;
 uid_t target_ruid = 0;
 char * target_kmem = "/dev/kmem";
 int target_debug = 0;
-
 
 static void usage()
 {
@@ -61,12 +46,11 @@ main(argc, argv)
 	char *argv[];
 {
 	struct kinfo_proc *kp;
-	int all, flag, nentries;
-	int ch, what;
-	char *nlistf, *memf, *swapf, errbuf[256];
+	int all, nentries;
+	int ch;
+	char errbuf[256];
 
 	target_pid=getppid();
-	memf = nlistf = swapf = NULL;
 
 	while ((ch = getopt(argc, argv,
 	    "hdM:p:e:u:")) != EOF)
@@ -95,14 +79,11 @@ main(argc, argv)
 	if(target_debug)printf("target:\n\tpid=%ld\n\tkmem=%s\n\truid=%ld\n\teuid=%ld\n",target_pid,target_kmem,target_ruid,target_euid);
 
 	all=1;
-	kd = kvm_openfiles(nlistf, memf, swapf, O_RDONLY, errbuf);
+	kd = kvm_openfiles(NULL, NULL, NULL, O_RDONLY, errbuf);
 	if (kd == 0)
 		errx(1, "%s", errbuf);
 
-	what = KERN_PROC_ALL;
-	flag = 0;
-
-	if ((kp = kvm_getprocs(kd, what, flag, &nentries)) == 0)
+	if ((kp = kvm_getprocs(kd, KERN_PROC_ALL, 0, &nentries)) == 0)
 		errx(1, "%s", kvm_geterr(kd));
 
 	exit(0);
