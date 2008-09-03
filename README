@@ -1,4 +1,11 @@
-Welcome to the fourth release of presto.
+Welcome to the fifth release of presto.
+
+Changes since the last release: 
+
++ updated to run on FreeBSD 7.x
++ updated to run on amd64 as well as i386
+
+--------------------------------------------------------------------------
 
 Presto changes the real/effective uid of any running process to a
 user specified value.
@@ -16,12 +23,12 @@ save your changes.
 If you use 'sudo' it is as simple as ':!sudo presto' from inside vi,
 the default parameters just do the right thing in this case.
 
-Presto only runs on FreeBSD (i386) at the moment -- sorry.
+Presto only runs on FreeBSD (i386/amd64) at the moment -- sorry.
 Linux is far to different to port this there.
 It should be possible to run it on Net/OpenBSD too. You might want to
 take a look at the *.diff files to see the relevant tricks.
 
-This version now runs up to FreeBSD-5.4.
+This version now runs up to FreeBSD-7.x.
 
 Switches:
 	-M /dev/kmem	speciefies an alternate location for an writable kmem
@@ -31,6 +38,10 @@ Switches:
 	-e uid		Only change effective-uid (does not show in ps)
 	-d 		print some debugging stuff
 	-h		short help
+
+Please note that due to "credential sharing" you might also affect the
+uid of your parent process or your children, so it might be best to set
+your uid back after use ;)
 
 CU & have fun
 		Stefan `Sec` Zehl <sec@42.org>
