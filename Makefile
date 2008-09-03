@@ -1,6 +1,5 @@
 RM=rm -f
 ARCH!=uname -m
-ARCH=i386
 OBJ=kvm.o kvm_${ARCH}.o kvm_proc.o ps.o
 KVM=kvm.c kvm_${ARCH}.c kvm_proc.c kvm_private.h
 
