@@ -1,6 +1,13 @@
 RM=rm -f
-OBJ=kvm.o kvm_i386.o kvm_proc.o ps.o
-KVM=kvm.c kvm_i386.c kvm_proc.c kvm_private.h
+ARCH!=uname -m
+ARCH=i386
+OBJ=kvm.o kvm_${ARCH}.o kvm_proc.o ps.o
+KVM=kvm.c kvm_${ARCH}.c kvm_proc.c kvm_private.h
+
+.if exists(/usr/src/lib/libkvm/kvm_minidump_${ARCH}.c)
+OBJ+= kvm_minidump_${ARCH}.o
+KVM+= kvm_minidump_${ARCH}.c
+.endif
 
 presto: $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $(OBJ) 
