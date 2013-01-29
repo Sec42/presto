@@ -8,6 +8,12 @@ OBJ+= kvm_minidump_${ARCH}.o
 KVM+= kvm_minidump_${ARCH}.c
 .endif
 
+# New in FreeBSD-8.x
+.if exists(/usr/src/lib/libkvm/kvm_vnet.c)
+OBJ+= kvm_vnet.o
+KVM+= kvm_vnet.c
+.endif
+
 presto: $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $(OBJ) 
 

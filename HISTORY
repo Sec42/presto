@@ -4,3 +4,4 @@
 27 Jan 2001: 1.3 reworked patch system, added 4.2-RELEASE
 11 Sep 2005: 1.4 new patch for FreeBSD-5.4-STABLE
 03 Sep 2008: 1.5 new patch for FreeBSD-7.x, also supports amd64 now
+13 Jan 2011: 1.6 update for FreeBSD-8.x, added kvm_vnet.c

