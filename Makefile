@@ -14,6 +14,12 @@ OBJ+= kvm_vnet.o
 KVM+= kvm_vnet.c
 .endif
 
+# Needed in FreeBSD-8.3+
+.if exists(/usr/src/lib/libkvm/kvm_pcpu.c)
+OBJ+= kvm_pcpu.o
+KVM+= kvm_pcpu.c
+.endif
+
 presto: $(OBJ)
 	$(CC) $(CFLAGS) -o $@ $(OBJ) 
 
